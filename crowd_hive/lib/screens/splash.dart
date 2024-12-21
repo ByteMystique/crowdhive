@@ -1,3 +1,5 @@
+
+import 'package:crowd_hive/screens/choice.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
@@ -20,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) =>  LoginPage(),
+          builder: (context) =>  ChoicePage(),
         ),
       );
     });

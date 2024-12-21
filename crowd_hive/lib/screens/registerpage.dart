@@ -1,17 +1,15 @@
-import 'package:crowd_hive/components/my_button.dart';
-import 'package:crowd_hive/screens/registerpage.dart';
 import 'package:crowd_hive/screens/userui.dart';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart'; // Import Lottie
+import 'package:crowd_hive/components/my_button.dart'; // Single valid import
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   // Text editing controllers
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
@@ -20,18 +18,10 @@ class _LoginPageState extends State<LoginPage> {
   // Password visibility toggle
   bool _isPasswordVisible = false;
 
-  // Sign user in method
-  void signUserIn() {
-    // Placeholder for sign-in logic
-    print('Sign In Clicked');
-  }
-
-  // Navigate to Register Page
-  void navigateToRegisterPage(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const RegisterPage()),
-    );
+  // Sign up method
+  void signUserUp() {
+    // Placeholder for sign-up logic
+    print('Sign Up Clicked');
   }
 
   @override
@@ -46,29 +36,38 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 const SizedBox(height: 50),
 
-                // Lottie animation
-                Lottie.network(
-                  'https://lottie.host/cf3cadc7-a962-4f9c-af23-48238d507c10/kcmohLQFCK.json',
-                  height: 150,
-                  width: 245,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Text('Failed to load animation');
-                  },
+                // Title or Animation (Optional)
+                Text(
+                  'Create an Account',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[700],
+                  ),
                 ),
 
                 const SizedBox(height: 50),
 
-                // Welcome back text
-                Text(
-                  'Welcome Back!',
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 20,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: TextField(
+                    controller: usernameController,
+                    decoration: InputDecoration(
+                      hintText: 'Full Name',
+                      hintStyle: TextStyle(color: Colors.grey),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey.shade400),
+                      ),
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.blue),
+                      ),
+                      fillColor: Colors.grey.shade200,
+                      filled: true,
+                    ),
                   ),
                 ),
 
-                const SizedBox(height: 25),
+                const SizedBox(height: 10),
 
                 // Username textfield
                 Padding(
@@ -82,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
                         borderSide: BorderSide(color: Colors.grey.shade400),
                       ),
                       focusedBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey),
+                        borderSide: BorderSide(color: Colors.blue),
                       ),
                       fillColor: Colors.grey.shade200,
                       filled: true,
@@ -105,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
                         borderSide: BorderSide(color: Colors.grey.shade400),
                       ),
                       focusedBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey),
+                        borderSide: BorderSide(color: Colors.blue),
                       ),
                       fillColor: Colors.grey.shade200,
                       filled: true,
@@ -140,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
                         borderSide: BorderSide(color: Colors.grey.shade400),
                       ),
                       focusedBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey),
+                        borderSide: BorderSide(color: Colors.blue),
                       ),
                       fillColor: Colors.grey.shade200,
                       filled: true,
@@ -150,8 +149,8 @@ class _LoginPageState extends State<LoginPage> {
 
                 const SizedBox(height: 25),
 
-                // Sign in button
-                MyButton(
+                // Sign up button
+                 MyButton(
   onTap: () {
     // Navigate to DashboardScreen
     Navigator.push(
@@ -161,27 +160,27 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   },
-  buttonText: "Sign In",
+  buttonText: "Sign Up",
 )
 ,
 
                 const SizedBox(height: 50),
 
-                // Not a member? Register now
+                // Already have an account? Log in
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Not a member?',
+                      'Already have an account?',
                       style: TextStyle(color: Colors.grey[700]),
                     ),
                     const SizedBox(width: 4),
                     GestureDetector(
                       onTap: () {
-                        navigateToRegisterPage(context); // Navigate to Register Page
+                        Navigator.pop(context); // Navigate back to LoginPage
                       },
                       child: const Text(
-                        'Register now',
+                        'Log in',
                         style: TextStyle(
                           color: Colors.blue,
                           fontWeight: FontWeight.bold,

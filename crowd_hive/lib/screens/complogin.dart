@@ -1,17 +1,18 @@
 import 'package:crowd_hive/components/my_button.dart';
-import 'package:crowd_hive/screens/registerpage.dart';
-import 'package:crowd_hive/screens/userui.dart';
+import 'package:crowd_hive/screens/compregister.dart';
+import 'package:crowd_hive/screens/compregister.dart';
+import 'package:crowd_hive/screens/compui.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart'; // Import Lottie
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class LoginPageC extends StatefulWidget {
+  const LoginPageC({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<LoginPageC> createState() => _LoginPageCState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageCState extends State<LoginPageC> {
   // Text editing controllers
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
@@ -27,10 +28,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   // Navigate to Register Page
-  void navigateToRegisterPage(BuildContext context) {
+  void navigateToRegisterPageC(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const RegisterPage()),
+      MaterialPageRoute(builder: (context) => const RegisterPageC()),
     );
   }
 
@@ -76,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: TextField(
                     controller: usernameController,
                     decoration: InputDecoration(
-                      hintText: 'Username',
+                      hintText: 'Company Name',
                       hintStyle: TextStyle(color: Colors.grey),
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.grey.shade400),
@@ -157,7 +158,7 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const DashboardScreen(), // Replace with your screen
+        builder: (context) => const EmployeeDashboard(), // Replace with your screen
       ),
     );
   },
@@ -178,7 +179,7 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(width: 4),
                     GestureDetector(
                       onTap: () {
-                        navigateToRegisterPage(context); // Navigate to Register Page
+                        navigateToRegisterPageC(context); // Navigate to Register Page
                       },
                       child: const Text(
                         'Register now',
