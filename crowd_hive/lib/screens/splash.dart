@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+
 import '../main.dart'; // Import relative to the folder
+import 'welcome.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -18,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const MyHomePage(title: 'Home Page'),
+          builder: (context) =>  LoginPage(),
         ),
       );
     });
@@ -27,7 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Splash screen background
+      backgroundColor: Colors.grey[50], // Splash screen background
       body: Center(
         child: Lottie.network(
           'https://lottie.host/9064b181-7d94-439e-a130-034f39583b20/ddsejJdZHL.json', // Example Lottie animation
