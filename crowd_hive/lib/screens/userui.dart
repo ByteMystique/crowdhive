@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -8,13 +10,12 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  int _currentIndex = 0; // Track the currently selected tab
+  int _currentIndex = 0;
 
-  // Screens for each tab
   final List<Widget> _pages = [
-    FundsScreen(), // Funds screen with cards
-    SettingsScreen(), // Settings screen
-    UserProfileScreen(), // Profile screen
+    const FundsScreen(),
+    const SettingsScreen(),
+    const UserProfileScreen(),
   ];
 
   @override
@@ -33,13 +34,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         elevation: 0,
         centerTitle: true,
       ),
-      body: _pages[_currentIndex], // Display the current page
-
+      body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
           setState(() {
-            _currentIndex = index; // Update the selected tab
+            _currentIndex = index;
           });
         },
         items: const [
@@ -61,43 +61,86 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
-// Funds Screen
-class FundsScreen extends StatelessWidget {
+class FundsScreen extends StatefulWidget {
+  const FundsScreen({super.key});
+
+  @override
+  State<FundsScreen> createState() => _FundsScreenState();
+}
+
+class _FundsScreenState extends State<FundsScreen> {
+  List<Map<String, dynamic>> funds = [];
+  bool isLoading = true;
+  String errorMessage = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchFunds();
+  }
+
+  Future<void> fetchFunds() async {
+    final url = 'http://192.168.29.150:4000/get-posters'; // Replace <your-ip> with the backend IP
+
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          funds = List<Map<String, dynamic>>.from(data['posters']);
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          errorMessage = 'Failed to fetch funds: ${response.reasonPhrase}';
+          isLoading = false;
+        });
+      }
+    } catch (error) {
+      setState(() {
+        errorMessage = 'Error: $error';
+        isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (errorMessage.isNotEmpty) {
+      return Center(
+        child: Text(errorMessage, style: const TextStyle(color: Colors.red)),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: GridView.builder(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2, // Two cards in a row
+          crossAxisCount: 2,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
         ),
-        itemCount: 5, // Number of cards
+        itemCount: funds.length,
         itemBuilder: (context, index) {
-          // Example data for cards
-          final cardsData = [
-            {"title": "Play & Win", "subtitle": "Rewards", "color": Colors.purple},
-            {"title": "December Spends", "subtitle": "₹441", "color": Colors.green},
-            {"title": "Pay Bills", "subtitle": "Instantly", "color": Colors.deepPurple},
-            {"title": "Autopay", "subtitle": "0 Active", "color": Colors.blue},
-            {"title": "Invite", "subtitle": "Earn up to ₹500", "color": Colors.red},
-          ];
-          final card = cardsData[index];
+          final fund = funds[index];
 
           return GestureDetector(
             onTap: () {
-              // Navigate to FundDetailsScreen with card details
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => FundDetailsScreen(fund: card),
+                  builder: (context) => FundDetailsScreen(fund: fund),
                 ),
               );
             },
             child: Container(
               decoration: BoxDecoration(
-                color: card["color"] as Color,
+                color: Colors.blue,
                 borderRadius: BorderRadius.circular(15),
               ),
               child: Padding(
@@ -106,7 +149,7 @@ class FundsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      card["title"] as String,
+                      fund["heading"] ?? "No Title",
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -115,7 +158,7 @@ class FundsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      card["subtitle"] as String,
+                      fund["description"] ?? "No Description",
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 14,
@@ -132,7 +175,6 @@ class FundsScreen extends StatelessWidget {
   }
 }
 
-// Fund Details Screen
 class FundDetailsScreen extends StatelessWidget {
   final Map<String, dynamic> fund;
 
@@ -142,7 +184,7 @@ class FundDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(fund['title'] as String),
+        title: Text(fund['heading'] ?? "Fund Details"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -150,7 +192,7 @@ class FundDetailsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              fund['title'] as String,
+              fund['heading'] ?? "No Title",
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -158,13 +200,23 @@ class FundDetailsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              fund['subtitle'] as String,
+              fund['description'] ?? "No Description",
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 16),
             Text(
-              "More details about this fund will go here...",
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
+              "End Goal: ${fund['endGoal'] ?? 'N/A'}",
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "Expected Amount: ₹${fund['expectedAmount'] ?? 'N/A'}",
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "Duration: ${fund['duration'] ?? 'N/A'} days",
+              style: const TextStyle(fontSize: 16),
             ),
           ],
         ),
@@ -173,28 +225,24 @@ class FundDetailsScreen extends StatelessWidget {
   }
 }
 
-// Settings Screen
 class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return const Center(
-      child: Text(
-        "Settings Screen",
-        style: TextStyle(fontSize: 20),
-      ),
+      child: Text("Settings Screen"),
     );
   }
 }
 
-// User Profile Screen
 class UserProfileScreen extends StatelessWidget {
+  const UserProfileScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return const Center(
-      child: Text(
-        "Profile Screen",
-        style: TextStyle(fontSize: 20),
-      ),
+      child: Text("Profile Screen"),
     );
   }
 }

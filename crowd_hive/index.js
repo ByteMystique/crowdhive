@@ -10,7 +10,7 @@ mongoose.connect("mongodb://localhost:27017/crowdfunding")
     .catch(err => console.log(err));
 
 const app = express();
-const port = 3000;
+const port = 4000; // Use a different port
 
 // Middleware to parse JSON bodies
 app.use(express.json());
@@ -88,7 +88,7 @@ app.post("/login", async (req, res) => {
 });
 
 // === Endpoint for creating advertisements (POST) ===
-app.post("/create-poste  r", async (req, res) => {
+app.post("/create-poster", async (req, res) => {
     console.log("Received request to /create-poster");
     const { companyId, heading, description, endGoal, expectedAmount, duration } = req.body;
     try {
@@ -125,6 +125,6 @@ app.post("/register-company", async (req, res) => {
 });
 
 // Start server
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
     console.log(`Backend listening on port ${port}`);
 });

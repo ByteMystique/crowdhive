@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class EmployeeDashboard extends StatefulWidget {
   const EmployeeDashboard({super.key});
@@ -65,156 +67,10 @@ class DashboardTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Welcome Back, [Employee Name]!",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Quick Stats
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildStatCard("Funds Raised", "\$120,000", Colors.green),
-                _buildStatCard("Active Campaigns", "5", Colors.blue),
-                _buildStatCard("Total Contributors", "300", Colors.orange),
-              ],
-            ),
-            const SizedBox(height: 30),
-
-            // Active Campaigns Section
-            const Text(
-              "Active Campaigns",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-              ),
-              itemCount: 3, // Number of active campaigns
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    // Navigate to campaign details page
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.blue,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            "Campaign Title",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            "Raised: \$30,000",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            "Target: \$50,000",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-
-            const SizedBox(height: 30),
-
-            // Recent Activity Section
-            const Text(
-              "Recent Activity",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: 3, // Number of recent activities
-              itemBuilder: (context, index) {
-                return ListTile(
-                  leading: const Icon(Icons.notifications),
-                  title: Text("Milestone achieved for Campaign ${index + 1}"),
-                  subtitle: const Text("2 hours ago"),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Helper to build a stat card
-  Widget _buildStatCard(String title, String value, Color color) {
-    return Container(
-      width: 100,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        children: [
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-            ),
-          ),
-        ],
+    return const Center(
+      child: Text(
+        "Dashboard Content (Optional)",
+        style: TextStyle(fontSize: 20),
       ),
     );
   }
@@ -226,17 +82,61 @@ class AddContributionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Controllers to capture user input
     final TextEditingController headingController = TextEditingController();
     final TextEditingController descriptionController = TextEditingController();
     final TextEditingController endGoalController = TextEditingController();
-    final TextEditingController expectedAmountController =
-        TextEditingController();
+    final TextEditingController expectedAmountController = TextEditingController();
     final TextEditingController durationController = TextEditingController();
+
+    // Function to submit contribution data
+    Future<void> submitContribution() async {
+      // Payload to send to the API
+      final payload = {
+        "companyId": "63fbeefad8390c00dcae1a5f", // Replace with actual company ID
+        "heading": headingController.text,
+        "description": descriptionController.text,
+        "endGoal": endGoalController.text,
+        "expectedAmount": int.tryParse(expectedAmountController.text) ?? 0,
+        "duration": int.tryParse(durationController.text) ?? 0,
+      };
+
+      try {
+        // POST request to the API
+        final response = await http.post(
+          Uri.parse('http://192.168.29.150:4000/create-poster'), // Replace <your-ip> with your backend's IP
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode(payload),
+        );
+
+        // Handle response
+        if (response.statusCode == 201) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Contribution added successfully!')),
+          );
+          // Clear form fields after successful submission
+          headingController.clear();
+          descriptionController.clear();
+          endGoalController.clear();
+          expectedAmountController.clear();
+          durationController.clear();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${response.body}')),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An error occurred: $e')),
+        );
+      }
+    }
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
+          // Input fields
           TextField(
             controller: headingController,
             decoration: const InputDecoration(
@@ -279,12 +179,10 @@ class AddContributionScreen extends StatelessWidget {
             keyboardType: TextInputType.number,
           ),
           const SizedBox(height: 32),
+
+          // Submit button
           ElevatedButton(
-            onPressed: () {
-              // Add API submission logic here
-              print("Heading: ${headingController.text}");
-              print("Description: ${descriptionController.text}");
-            },
+            onPressed: submitContribution, // Call the function on button click
             child: const Text("Submit"),
           ),
         ],
